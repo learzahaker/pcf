@@ -680,15 +680,16 @@
                 <a class="item active" data-tab="info">
                     Issue information
                 </a>
+                <a class="item" data-tab="scores">
+                    Issue metrics
+                </a>				
                 <a class="item" data-tab="poc">
                     Proof of concepts
                 </a>
                 <a class="item" data-tab="fields">
                     Additional fields
                 </a>
-                <a class="item" data-tab="scores">
-                    Issue metrics
-                </a>
+
             </div>
             <div class="ui tab active" data-tab="info">
                 <form class="ui form" method="post"
@@ -713,6 +714,45 @@
                                         </datalist>
                                     </div>
                                 </div>
+								<div class="ui field">
+									<div class="ui labeled input">
+										<div class="ui label" style="width: 130px;">
+											<i class="hashtag icon"></i>CVSS:
+										</div>
+										<input  type="number" id="origin_cvss" name="cvss" step="0.1" min="0" max="10"
+											   placeholder="10.0"
+											   value="{{ (current_issue['cvss']) }}">
+										<button  type="button" class="ui button blue" data-tab="scores">
+											<i class="ui calculator icon"></i>CVSS calculator
+										</button>
+									</div>
+								</div>
+								<div id="cvss_hidden" style="display: none">
+									<div class="ui divider"></div>
+									<div id="cvssboard">
+									</div>
+									<div class="ui divider"></div>
+								</div>
+								<div class="ui field">
+									<div class="ui labeled input">
+										<div class="ui label" style="width: 130px;">
+											<i class="hashtag icon"></i>CVSS Vector:
+										</div>
+										<input  type="text" id="origin_cvss_vector" name="cve" placeholder="2020-1337"
+											   value="{{ (current_issue['cve']) }}">
+									</div>
+								</div>
+								<div class="ui field">
+									<div class="ui labeled input">
+										<div class="ui label" style="width: 130px;">
+											<i class="hashtag icon"></i>CWE:
+										</div>
+										<input type="search" name="cwe" placeholder="123"
+											   value="{{ (current_issue['cwe']) }}" list="cwe_hints" title="Invalid CWE (0-...)" pattern="[0-9]+">
+										<datalist id="cwe_hints">
+										</datalist>
+									</div>
+								</div>								
                                 <div class="ui field">
                                     <div class="ui labeled input">
                                         <div class="ui label" style="width: 130px;">
@@ -725,28 +765,19 @@
                                 <div class="ui field">
                                     <div class="ui labeled input">
                                         <div class="ui label" style="width: 130px;">
+                                            <i class="exclamation triangle icon"></i>Impact:
+                                        </div>
+                                        <textarea rows="2" name="risks"
+                                                  placeholder="Issue exploitation risks">{{ (current_issue['risks']) }}</textarea>
+                                    </div>
+                                </div>								
+                                <div class="ui field">
+                                    <div class="ui labeled input">
+                                        <div class="ui label" style="width: 130px;">
                                             <i class="medkit icon"></i>Fix:
                                         </div>
                                         <textarea rows="2" name="fix"
                                                   placeholder="To fix this vulnerability you need...">{{ (current_issue['fix']) }}</textarea>
-                                    </div>
-                                </div>
-                                <div class="ui field">
-                                    <div class="ui labeled input">
-                                        <div class="ui label" style="width: 125px;">
-                                            <i class="cog icon"></i>Technical:
-                                        </div>
-                                        <textarea rows="2" name="technical"
-                                                  placeholder="Technical information about issue">{{ (current_issue['technical']) }}</textarea>
-                                    </div>
-                                </div>
-                                <div class="ui field">
-                                    <div class="ui labeled input">
-                                        <div class="ui label" style="width: 125px;">
-                                            <i class="exclamation triangle icon"></i>Risks:
-                                        </div>
-                                        <textarea rows="2" name="risks"
-                                                  placeholder="Issue exploitation risks">{{ (current_issue['risks']) }}</textarea>
                                     </div>
                                 </div>
                                 <div class="ui field">
@@ -797,55 +828,7 @@
                             </div>
                         </div>
                         <div class="eight wide column">
-                            <div class="ui field">
-                                <div class="ui labeled input">
-                                    <div class="ui label" style="width: 170px;">
-                                        <i class="folder open icon"></i>URL path/service:
-                                    </div>
-                                    <input type="text" name="url" placeholder="/admin/"
-                                           value="{{ (current_issue['url_path']) }}">
-                                </div>
-                            </div>
-                            <div class="ui field">
-                                <div class="ui labeled input">
-                                    <div class="ui label" style="width: 170px;">
-                                        <i class="hashtag icon"></i>CVSS:
-                                    </div>
-                                    <input type="number" id="origin_cvss" name="cvss" step="0.01" min="0" max="10"
-                                           placeholder="10.0"
-                                           value="{{ (current_issue['cvss']) }}">
-                                    <button type="button" class="ui button blue" onclick="$('#cvss_hidden').toggle();">
-                                        <i class="ui calculator icon"></i>CVSS calculator
-                                    </button>
-                                </div>
-                            </div>
-                            <div id="cvss_hidden" style="display: none">
-                                <div class="ui divider"></div>
-                                <div id="cvssboard">
-                                </div>
-                                <div class="ui divider"></div>
-                            </div>
-                            <div class="ui field">
-                                <div class="ui labeled input">
-                                    <div class="ui label" style="width: 170px;">
-                                        <i class="hashtag icon"></i>CVE:
-                                    </div>
-                                    <input type="text" name="cve" placeholder="2020-1337"
-                                           value="{{ (current_issue['cve']) }}">
-                                </div>
-                            </div>
-                            <div class="ui field">
-                                <div class="ui labeled input">
-                                    <div class="ui label" style="width: 170px;">
-                                        <i class="hashtag icon"></i>CWE:
-                                    </div>
-                                    <input type="search" name="cwe" placeholder="123"
-                                           value="{{ (current_issue['cwe']) }}" list="cwe_hints" title="Invalid CWE (0-...)" pattern="[0-9]+">
-                                    <datalist id="cwe_hints">
-                                    </datalist>
-                                </div>
-                            </div>
-                            <div class="ui field">
+							<div class="ui field">
                                 <div class="ui labeled input">
                                     <div class="ui label" style="width: 170px;">
                                         <i class="question circle icon"></i>Status:
@@ -902,38 +885,59 @@
                             <div class="ui field">
                                 <div class="ui labeled input">
                                     <div class="ui label" style="width: 170px;">
-                                        <i class="desktop icon"></i>Parameter:
-                                    </div>
-                                    <input type="text" name="param" placeholder="(GET) id=123"
-                                           value="{{ (current_issue['param']) }}">
-                                </div>
-                            </div>
-                            <div class="ui field">
-                                <div class="ui labeled input">
-                                    <div class="ui label" style="width: 170px;">
-                                        <i class="desktop icon"></i>Type:
+                                        <i class="desktop icon"></i>HTTP Type:
                                     </div>
                                     <div class="ui fluid selection dropdown" id="services_list">
                                         <input type="hidden" name="issue_type" required
                                                value="{{ (current_issue['type']) }}">
                                         <i class="dropdown icon"></i>
-                                        <div class="default text">Select type</div>
+                                        <div class="default text">Select HTTP Type</div>
                                         <div class="menu">
-                                            <div class="item" data-value="custom">Custom</div>
-                                            <div class="item" data-value="web">Web</div>
-                                            <div class="item" data-value="credentials">Credentials</div>
-                                            <div class="item" data-value="service">Service</div>
+											<div class="default text">-</div>
+                                            <div class="item" data-value="custom">GET</div>
+                                            <div class="item" data-value="web">POST</div>
+                                            <div class="item" data-value="credentials">PUT</div>
+                                            <div class="item" data-value="service">TRACE</div>
+                                            <div class="item" data-value="service">DELETE</div>
+											
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            </div>							
                             <div class="ui field">
                                 <div class="ui labeled input">
                                     <div class="ui label" style="width: 170px;">
-                                        <i class="user secret icon"></i>Intruder:
+                                        <i class="folder open icon"></i>URL path/service:
                                     </div>
-                                    <input type="text" name="intruder" placeholder="Internal / External / Authenticated"
-                                           value="{{ current_issue['intruder'] }}">
+                                    <input type="text" name="url" placeholder="/admin/"
+                                           value="{{ (current_issue['url_path']) }}">
+                                </div>
+                            </div>							
+                            
+                            <div class="ui field">
+                                <div class="ui labeled input">
+                                    <div class="ui label" style="width: 170px;">
+                                        <i class="desktop icon"></i>Parameter:
+                                    </div>
+                                    <input type="text" name="param" placeholder="id=123"
+                                           value="{{ (current_issue['param']) }}">
+                                </div>
+                            </div>
+							<div class="ui field">
+								<div class="ui labeled input">
+									<div class="ui label" style="width: 125px;">
+										<i class="cog icon"></i>Step to Reproduce:
+									</div>
+									<textarea rows="4" name="technical"
+											  placeholder="In numbering will be better...">{{ (current_issue['technical']) }}</textarea>
+								</div>
+							</div>
+                            <div class="ui field">
+                                <div class="ui labeled input">
+                                    <div class="ui label" style="width: 125px;">
+                                        <i class="user secret icon"></i>Burp Request:
+                                    </div>
+<!-- 									<textarea rows="2" name="technical" placeholder="Technical information about issue">{{ (current_issue['technical']) }}</textarea>-->									<textarea rows="8" name="intruder" placeholder="GET / HTTP 1.1 ...">{{ (current_issue['intruder']) }}</textarea>
                                 </div>
                             </div>
                             {% if update_info_errors is defined and update_info_errors %}
@@ -1665,25 +1669,29 @@
                                 data: {
                                     'csrf_token': csrf,
                                     'additional_field_name': 'origin_cvss',
-                                    'additional_field_type': 'float',
-                                    'additional_field_value': parseFloat(cvss_score)
+                                    'additional_field_type': 'text',
+                                    'additional_field_value': parseFloat(cvss_score),
+                                    'additional_field_name': 'origin_cvss_vector',
+                                    'additional_field_type': 'text',
+                                    'additional_field_value': cvss_vector									
                                 },
                                 success: function (data) {
                                     if (data === 'ok') {
                                         // change cvss at main page
                                         $('#origin_cvss')[0].value = parseFloat(cvss_score);
+										$('#origin_cvss_vector')[0].value =cvss_vector;
                                         $('body')
                                             .toast({
                                                 class: 'success',
                                                 position: 'bottom right',
-                                                message: `Saved!`
+                                                message: `Saved1!`
                                             });
                                     } else {
                                         $('body')
                                             .toast({
                                                 class: 'error',
                                                 position: 'bottom right',
-                                                message: `Error!`
+                                                message: `Error1!`
                                             });
                                     }
                                 },
@@ -1692,12 +1700,12 @@
                                         .toast({
                                             class: 'error',
                                             position: 'bottom right',
-                                            message: `Error!`
+                                            message: `Error2!`
                                         });
                                 }
                             });
                         }
-
+						else{
 
                         // send cvss metrics
                         $.ajax({
@@ -1712,18 +1720,19 @@
                             success: function (data) {
                                 if (data === 'ok') {
                                     //idk what to do now :)
+									 $('#cvss_vector')[0].value = parseFloat(cvss_score);
                                     $('body')
                                         .toast({
                                             class: 'success',
                                             position: 'bottom right',
-                                            message: `Saved!`
+                                            message: `Saved2!`
                                         });
                                 } else {
                                     $('body')
                                         .toast({
                                             class: 'error',
                                             position: 'bottom right',
-                                            message: `Error!`
+                                            message: `Error3!`
                                         });
                                 }
                             },
@@ -1732,10 +1741,10 @@
                                     .toast({
                                         class: 'error',
                                         position: 'bottom right',
-                                        message: `Error!`
+                                        message: `Error4!`
                                     });
                             }
-                        });
+                        });}
                     }
 
                 </script>

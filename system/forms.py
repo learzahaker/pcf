@@ -146,9 +146,7 @@ class AddNewProject(FlaskForm):
 
 class NewHost(FlaskForm):
     ip = StringField('ip',
-                     validators=[DataRequired(message='IP required!'),
-                                 IPAddress(ipv4=True, ipv6=True,
-                                           message='Wrong IPv4 or TPv6 format!')])
+                     validators=[DataRequired(message='IP required!')])
 
     description = StringField('description', default='')
 

@@ -636,7 +636,7 @@
                 </thead>
                 <tbody>
                 {% for host in host_array %}
-                    {% if ':' not in host['ip'] %} {% set ip_array = host['ip'].split('.') %} {% endif %}
+                    
                     <tr id="host_row" class="custom-clickable-row"
                         data-href="/project/{{ current_project['id'] }}/host/{{ host['id'] }}/"
                         title="Double click to open">
@@ -647,8 +647,7 @@
                                 <label></label>
                             </div>
                         </td>
-                        <td {% if ':' not in host['ip'] %}data-order="{{ ('{:0>3}{:0>3}{:0>3}{:0>3}'.format(ip_array[0],ip_array[1],ip_array[2],ip_array[3])) }}"
-                            {% else %}data-order=""{% endif %}>
+                        <td>
                             <h4>{{ (host['ip']) }}</h4></td>
                         <td style="word-break: break-all;">
                             <h4>

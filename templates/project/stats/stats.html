@@ -1,5 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
+<style>
+#customers {
+  font-family: Arial, Helvetica, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+#customers td, #customers th {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+#customers tr:nth-child(even){background-color: #f2f2f2;}
+
+#customers tr:hover {background-color: #ddd;}
+
+</style>
 {% if external_js %}
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 {% else %}
@@ -9,11 +26,13 @@
 <body style="height: 100%">
 <div id="segment_id" style="height: 100%">
     {% include 'menu.html' %}
+	
     <div class="ui grid" style="height: calc(100% - 40px)">
         <div class="ui column" style="width: 80px; padding-top: 50px; max-height: 100%">
             {% include 'project/sidebar.html' %}
         </div>
         {% set stats_dict = db.project_stats(current_project['id']) %}
+		{% set project_dict = db.select_report_info_sorted(current_project['id']) %}
         <div class="ui column" style="width: calc(100% - 80px); height: 100% ">
             <script>
                 function escapeHtml(text) {
@@ -643,263 +662,56 @@
                 <div class="ui container" style="width: 100%;height: 90%">
                     <div class="ui grid" style="height: 100%">
                         <div class="ui column thirteen wide" style="height: 100%">
-                            <div class="ui three column celled grid">
-                                <div class="column" style="height: 100%">
-                                    <!-- creds round -->
-                                    <script>
-                                        $(document).ready(function () {
-                                            var options = {
-                                                series: {{ json_pack(stats_dict['creds_array']) }},
-                                                colors: ['rgba(255,69,96,0.85)', 'rgb(254, 176, 25)', 'rgba(0,227,150,0.85)', 'rgb(0, 143, 251)'],
-                                                labels: ['Cleartext password', 'Password hash', 'Hash & Cleartext password', 'Just login/email'],
-                                                chart: {
-                                                    type: 'donut',
-                                                    toolbar: {show: true}
-                                                },
-                                                legend: {
-                                                    show: false
-                                                },
-                                                title: {
-                                                    text: 'Found credentials',
-                                                    align: 'left',
-                                                    margin: 10,
-                                                    offsetX: 0,
-                                                    offsetY: 0,
-                                                    floating: false,
-                                                    style: {
-                                                        fontSize: '14px',
-                                                        fontWeight: 'bold',
-                                                        fontFamily: undefined,
-                                                        color: '#263238'
-                                                    }
-                                                }
-                                            };
-                                            var chart = new ApexCharts(document.querySelector("#stats_creds"), options);
-                                            chart.render();
-                                        });
-                                    </script>
-                                    <div id="stats_creds" style="width:100%; height:100%;"></div>
-                                </div>
-                                <div class="column" style="height: 100%">
-                                    <!-- time left round -->
-                                    <script>
-                                        $(document).ready(function () {
-
-                                                var options = {
-                                                        series: [{{  stats_dict['project']['percents'] }}],
-                                                        chart: {
-                                                            type: 'radialBar',
-                                                            toolbar: {show: true},
-                                                        },
-                                                        plotOptions: {
-                                                            radialBar: {
-                                                                hollow: {
-                                                                    margin: 15,
-                                                                    size: '70%',
-                                                                    image: '{% if external_img %}https://apexcharts.com/samples/assets/images/clock.png{% else %}/static/images/clock.png{% endif %}',
-                                                                imageWidth: 64,
-                                                                imageHeight: 64,
-                                                                imageClipped: false
-                                                            },
-                                                            dataLabels: {
-                                                                name: {
-                                                                    show: false,
-                                                                    color: '#fff'
-                                                                },
-                                                                value: {
-                                                                    show: true,
-                                                                    color: '#333',
-                                                                    offsetY: 50,
-                                                                    fontSize: '22px'
-                                                                }
-                                                            }
-                                                        }
-                                                    },
-                                                    fill: {
-                                                        type: 'image',
-                                                        image: {
-                                                            src: ['{% if external_img %}
-                                                                https:
-                                                                //apexcharts.com/samples/assets/images/4274635880_809a4b9d0d_z.jpg{% else %}
-                                                                /static/images/stats_background.jpg{% endif %}'],
-                                                        }
-                                                    },
-                                                    stroke: {
-                                                        lineCap: 'round'
-                                                    },
-                                                    labels: ['Volatility'],
-                                                    title: {
-                                                        text: 'Time left',
-                                                        align: 'left',
-                                                        offsetX: 0,
-                                                        offsetY: 0,
-                                                        floating: false,
-                                                        style: {
-                                                            fontSize: '14px',
-                                                            fontWeight: 'bold',
-                                                            fontFamily: undefined,
-                                                            color: '#263238'
-                                                        }
-                                                    },
-                                                    };
-
-                                                var chart = new ApexCharts(document.querySelector("#stats_clock"), options);
-                                                chart.render();
-                                            }
-                                        );
-                                    </script>
-                                    <div id="stats_clock"></div>
-                                </div>
-                                <div class="column" style="max-height: 100%">
-                                    <!-- vulns round -->
-                                    <script>
-                                        $(document).ready(function () {
-                                            var options = {
-                                                series: {{ json_pack(stats_dict['issues_arr']) }},
-                                                chart: {
-                                                    type: 'radialBar',
-                                                    toolbar: {
-                                                        show: true,
-                                                        height: 390
-                                                    },
-                                                },
-                                                plotOptions: {
-                                                    radialBar: {
-                                                        offsetY: 0,
-                                                        startAngle: 0,
-                                                        endAngle: 270,
-                                                        hollow: {
-                                                            margin: 5,
-                                                            size: '30%',
-                                                            background: 'transparent',
-                                                            image: undefined,
-                                                        },
-                                                        dataLabels: {
-                                                            name: {
-                                                                show: false,
-                                                            },
-                                                            value: {
-                                                                show: false,
-                                                            }
-                                                        }
-                                                    }
-                                                },
-                                                colors: ['rgba(255,69,96,0.85)', 'rgb(254, 176, 25)', 'rgba(0,227,150,0.85)', 'rgb(0, 143, 251)', 'rgba(119,93,208,0.85)'],
-                                                labels: ['Critical', 'High', 'Medium', 'Low', 'Information'],
-                                                legend: {
-                                                    show: true,
-                                                    floating: true,
-                                                    fontSize: '16px',
-                                                    position: 'left',
-                                                    offsetX: -30,
-                                                    offsetY: 15,
-                                                    labels: {
-                                                        useSeriesColors: true,
-                                                    },
-                                                    markers: {
-                                                        size: 0
-                                                    },
-                                                    formatter: function (seriesName, opts) {
-                                                        values_dict =
-                                                        {{ json_pack(stats_dict['issues']) | safe }}
-                                                        return seriesName + ":  " + values_dict[seriesName]
-                                                    },
-                                                    itemMargin: {
-                                                        vertical: 3
-                                                    },
-                                                    backgroundColor: 'black'
-                                                },
-                                                responsive: [{
-                                                    breakpoint: 480,
-                                                    options: {
-                                                        legend: {
-                                                            show: false
-                                                        }
-                                                    }
-                                                }],
-
-                                                title: {
-                                                    text: 'Issues',
-                                                    align: 'left',
-                                                    margin: 10,
-                                                    offsetX: 0,
-                                                    offsetY: 0,
-                                                    floating: false,
-                                                    style: {
-                                                        fontSize: '14px',
-                                                        fontWeight: 'bold',
-                                                        fontFamily: undefined,
-                                                        color: '#263238'
-                                                    },
-                                                }
-                                            };
-
-                                            var chart = new ApexCharts(document.querySelector("#stats_vulns"), options);
-                                            chart.render();
-                                        });
-                                    </script>
-                                    <div id="stats_vulns"></div>
-                                </div>
-                            </div>
-                            <div class="ui two column celled grid">
+                            
+                            <div class="ui column celled grid">
                                 <div class="column" style="max-height: 100%">
                                     <!-- hosts graph -->
-                                    <script>
-                                        $(document).ready(function () {
-                                            var options = {
-                                                series: [{
-                                                    data: {{ json_pack(stats_dict['ports']['count']) }},
-                                                    name: 'ports'
-                                                }],
-                                                chart: {
-                                                    height: 350,
-                                                    type: 'bar',
-                                                    events: {
-                                                        click: function (chart, w, e) {
-                                                            // console.log(chart, w, e)
-                                                        }
-                                                    }
-                                                },
-                                                plotOptions: {
-                                                    bar: {
-                                                        borderRadius: 6,
-                                                        columnWidth: '45%',
-                                                        distributed: true,
-                                                    }
-                                                },
-                                                dataLabels: {
-                                                    enabled: false
-                                                },
-                                                xaxis: {
-                                                    categories: {{ json_pack(stats_dict['ports']['names']) | safe }},
-                                                    labels: {
-                                                        style: {
-                                                            fontSize: '12px'
-                                                        }
-                                                    }
-                                                },
-                                                title: {
-                                                    text: 'Open ports',
-                                                    align: 'left',
-                                                    margin: 10,
-                                                    offsetX: 0,
-                                                    offsetY: 0,
-                                                    floating: false,
-                                                    style: {
-                                                        fontSize: '14px',
-                                                        fontWeight: 'bold',
-                                                        fontFamily: undefined,
-                                                        color: '#263238'
-                                                    },
-                                                }
-                                            };
+																	
+									<table class="ui table" id="customers" style="width:100%">
+									<tr>
+									<th width="8%" style="background-color:#88a3b3;color: white">No</th>
+									<th width="50%" style="background-color:#88a3b3;color: white">URL/IP</th>
+									<th style="background-color:#8B0000;color: white"  >Critical</th>
+									<th style="background-color:#FF0000;color: white">High</th>
+									<th style="background-color:#FFA500;color: white">Medium</th>
+									<th style="background-color:#33cc33;color: white">Low</th>
+									<th style="background-color:#42b6f5;color: white">Total</th>
+									</tr>
+									{% set all_criticality = {'critical':0,'high':0,'medium':0,'low':0,'info':0} %}
+									{% set hosts = project_dict['hosts'] %}
+									{% set issues = project_dict['issues'] %}
+									{% for host_ip, host_data in hosts.items() %}
+										{% set clean_host_ip = host_ip.replace(':', '') %}
+										{% set criticality = {'critical':0,'high':0,'medium':0,'low':0,'info':0} %}
+										{% for issue_id in host_data.issues %}
+											{% set a = criticality.update({issues[issue_id]['criticality']:(criticality[issues[issue_id]['criticality']]+1)}) %}
+											{% set b = all_criticality.update({issues[issue_id]['criticality']:(all_criticality[issues[issue_id]['criticality']]+1)}) %}
+										{% endfor %}
 
-                                            var chart = new ApexCharts(document.querySelector("#stats_hosts"), options);
-                                            chart.render();
-                                        });
-                                    </script>
-                                    <div id="stats_hosts"></div>
+										
+									<tr>
+									<td>{{ loop.index }}</td>
+									<td>{{ clean_host_ip }}</td>
+									<td>{% if not criticality['critical'] %}0{% else %}{{criticality['critical']}}{% endif %}</td>
+									<td>{% if not criticality['high'] %}0{% else %}{{criticality['high']}}{% endif %}</td>
+									<td>{% if not criticality['medium'] %}0{% else %}{{criticality['medium']}}{% endif %}</td>
+									<td>{% if not criticality['low'] %}0{% else %}{{criticality['low']}}{% endif %}</td>
+									<td>{{ criticality['critical'] +  criticality['high']+ criticality['medium'] + criticality['low']}}</td>
+									</tr>
+									{% endfor %}
+									<td colspan="2" style="background-color:#88a3b3;color: white; border: 1px solid #ddd; padding: 8px;font-weight:bold">Grand total</td>
+									<td style="background-color:#88a3b3;color: white; border: 1px solid #ddd; padding: 8px;font-weight:bold">{% if not all_criticality['critical'] %}0{% else %}{{ all_criticality['critical']}}{% endif %}</td>
+									<td style="background-color:#88a3b3;color: white; border: 1px solid #ddd; padding: 8px;font-weight:bold">{% if not all_criticality['high'] %}0{% else %}{{ all_criticality['high']}}{% endif %}</td>
+									<td style="background-color:#88a3b3;color: white; border: 1px solid #ddd; padding: 8px;font-weight:bold">{% if not all_criticality['medium'] %}0{% else %}{{ all_criticality['medium']}}{% endif %}</td>
+									<td style="background-color:#88a3b3;color: white; border: 1px solid #ddd; padding: 8px;font-weight:bold">{% if not all_criticality['low'] %}0{% else %}{{ all_criticality['low']}}{% endif %}</td>
+									<td style="background-color:#88a3b3;color: white; border: 1px solid #ddd; padding: 8px;font-weight:bold">{{ all_criticality['critical'] +  all_criticality['high']+ all_criticality['medium'] + all_criticality['low']}}</td>
+									</tr>
+									</table>												
+
+
                                 </div>
+								</div>
+								<div class="ui two column celled grid">
                                 <div class="column" style="max-height: 100%">
                                     <!-- services graph -->
                                     <script>
@@ -963,7 +775,89 @@
                                         });
                                     </script>
                                     <div id="stats_services"></div>
+									                                    <script>
+                                        $(document).ready(function () {
+												var options = {
+												  series: [{
+												  name: 'Critical',
+												  data: [44, 55, 41, 37, 22, 43, 21]
+												}, {
+												  name: 'High',
+												  data: [53, 32, 33, 52, 13, 43, 32]
+												}, {
+												  name: 'Medium',
+												  data: [12, 17, 11, 9, 15, 11, 20]
+												}, {
+												  name: 'Low',
+												  data: [9, 7, 5, 8, 6, 9, 4]
+												}, {
+												  name: 'Info',
+												  data: [25, 12, 19, 32, 25, 24, 10]
+												}],
+												  chart: {
+												  type: 'bar',
+												  height: 350,
+												  stacked: true,
+												},
+												plotOptions: {
+												  bar: {
+													horizontal: true,
+													dataLabels: {
+													  total: {
+														enabled: true,
+														offsetX: 0,
+														style: {
+														  fontSize: '13px',
+														  fontWeight: 900
+														}
+													  }
+													}
+												  },
+												},
+												stroke: {
+												  width: 1,
+												  colors: ['#fff']
+												},
+												title: {
+												  text: 'Fiction Books Sales'
+												},
+												xaxis: {
+												  categories: [2008, 2009, 2010, 2011, 2012, 2013, 2014],
+												  labels: {
+													formatter: function (val) {
+													  return val + "K"
+													}
+												  }
+												},
+												yaxis: {
+												  title: {
+													text: undefined
+												  },
+												},
+												tooltip: {
+												  y: {
+													formatter: function (val) {
+													  return val + "K"
+													}
+												  }
+												},
+												fill: {
+												  opacity: 1
+												},
+												legend: {
+												  position: 'top',
+												  horizontalAlign: 'left',
+												  offsetX: 40
+												}
+												};
+
+												var chart = new ApexCharts(document.querySelector("#chart"), options);
+												chart.render();
+                                        });
+                                    </script>
+                                    <div id="chart"></div>
                                 </div>
+								
                             </div>
                         </div>
                         <div class="ui column three wide"></div>
@@ -1430,6 +1324,7 @@
                     <i class="close big red icon" onclick="cancel_new_task();" style="top: unset; right: 0rem;"></i>
                     <div class="header divided" id="task_header">
                         Create a new task!
+						
                     </div>
                     <div class="ui form" style="margin: 5px;">
                         <div class="ui grid">
