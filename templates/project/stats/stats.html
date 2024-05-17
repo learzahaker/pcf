@@ -23,6 +23,16 @@
     <script type="text/javascript" src="/static/js/apexcharts.js"></script>
 {% endif %}
 {% include 'header.html' %}
+        {% set stats_dict = db.project_stats(current_project['id']) %}
+		{% set project_dict = db.select_report_info_sorted(current_project['id']) %}
+									{% set all_criticality = {'critical':0,'high':0,'medium':0,'low':0,'info':0} %}
+									{% set all_criticality_crit = [] %}
+									{% set all_criticality_med = [] %}
+									{% set all_criticality_high = [] %}
+									{% set all_criticality_low = [] %}
+									{% set all_host = [] %}
+									{% set hosts = project_dict['hosts'] %}
+									{% set issues = project_dict['issues'] %}
 <body style="height: 100%">
 <div id="segment_id" style="height: 100%">
     {% include 'menu.html' %}
@@ -31,10 +41,11 @@
         <div class="ui column" style="width: 80px; padding-top: 50px; max-height: 100%">
             {% include 'project/sidebar.html' %}
         </div>
-        {% set stats_dict = db.project_stats(current_project['id']) %}
-		{% set project_dict = db.select_report_info_sorted(current_project['id']) %}
+		
         <div class="ui column" style="width: calc(100% - 80px); height: 100% ">
-            <script>
+		
+            <script>									
+									
                 function escapeHtml(text) {
                     var map = {
                         '&': '&amp;',
@@ -663,7 +674,7 @@
                     <div class="ui grid" style="height: 100%">
                         <div class="ui column thirteen wide" style="height: 100%">
                             
-                            <div class="ui column celled grid">
+                            <div class="ui two column celled grid">
                                 <div class="column" style="max-height: 100%">
                                     <!-- hosts graph -->
 																	
@@ -677,9 +688,7 @@
 									<th style="background-color:#33cc33;color: white">Low</th>
 									<th style="background-color:#42b6f5;color: white">Total</th>
 									</tr>
-									{% set all_criticality = {'critical':0,'high':0,'medium':0,'low':0,'info':0} %}
-									{% set hosts = project_dict['hosts'] %}
-									{% set issues = project_dict['issues'] %}
+
 									{% for host_ip, host_data in hosts.items() %}
 										{% set clean_host_ip = host_ip.replace(':', '') %}
 										{% set criticality = {'critical':0,'high':0,'medium':0,'low':0,'info':0} %}
@@ -687,8 +696,11 @@
 											{% set a = criticality.update({issues[issue_id]['criticality']:(criticality[issues[issue_id]['criticality']]+1)}) %}
 											{% set b = all_criticality.update({issues[issue_id]['criticality']:(all_criticality[issues[issue_id]['criticality']]+1)}) %}
 										{% endfor %}
-
-										
+									{% if not criticality['critical'] %}{{ all_criticality_crit.append(0) }}{% else %}{{ all_criticality_crit.append(criticality['critical']) }}{% endif %}
+									{% if not criticality['high'] %}{{ all_criticality_high.append(0) }}{% else %}{{ all_criticality_high.append(criticality['high']) }}{% endif %}
+									{% if not criticality['medium'] %}{{ all_criticality_med.append(0) }}{% else %}{{ all_criticality_med.append(criticality['medium']) }}{% endif %}
+									{% if not criticality['low'] %}{{ all_criticality_low.append(0) }}{% else %}{{ all_criticality_low.append(criticality['low']) }}{% endif %}
+									{{ all_host.append(clean_host_ip) }}	
 									<tr>
 									<td>{{ loop.index }}</td>
 									<td>{{ clean_host_ip }}</td>
@@ -706,12 +718,94 @@
 									<td style="background-color:#88a3b3;color: white; border: 1px solid #ddd; padding: 8px;font-weight:bold">{% if not all_criticality['low'] %}0{% else %}{{ all_criticality['low']}}{% endif %}</td>
 									<td style="background-color:#88a3b3;color: white; border: 1px solid #ddd; padding: 8px;font-weight:bold">{{ all_criticality['critical'] +  all_criticality['high']+ all_criticality['medium'] + all_criticality['low']}}</td>
 									</tr>
-									</table>												
+									</table>
+									 </div>
+									<div class="column" style="max-height: 100%">
+									<script>
+									
+                                        $(document).ready(function () {
+												var options = {
+												  colors : ['#8B0000', '#FF0000','#FFA500','#33CC33'],
+												  series: [{
+												  name: 'Critical',
+												  data: {{ json_pack(all_criticality_crit) }}
+												}, {
+												  name: 'High',
+												  data: {{ json_pack(all_criticality_high) }}
+												}, {
+												  name: 'Medium',
+												  data: {{ json_pack(all_criticality_med) }}
+												}, {
+												  name: 'Low',
+												  data: {{ json_pack(all_criticality_low) }}
+												}],
+												  
+												  chart: {
+												  type: 'bar',
+												  height: 350,
+												  stacked: true,
+												},
+												plotOptions: {
+												  bar: {
+													horizontal: true,
+													dataLabels: {
+													  total: {
+														enabled: true,
+														offsetX: 0,
+														style: {
+														  fontSize: '13px',
+														  fontWeight: 900
+														}
+													  }
+													}
+												  },
+												},
+												stroke: {
+												  width: 1,
+												  colors: ['#fff']
+												},
+												title: {
+												  text: 'Vulnerability'
+												},
+												xaxis: {
+												  categories: {{ json_pack(all_host)| safe }},
+												  labels: {
+													style: {
+                                                            fontSize: '12px'
+                                                        }
+												  }
+												},
+												yaxis: {
+												  title: {
+													text: undefined
+												  },
+												},
+												tooltip: {
+												  y: {
+													formatter: function (val) {
+													  return val + "K"
+													}
+												  }
+												},
+												fill: {
+												  opacity: 1
+												},
+												legend: {
+												  position: 'top',
+												  horizontalAlign: 'left',
+												  offsetX: 40
+												}
+												};
 
-
-                                </div>
+												var chart = new ApexCharts(document.querySelector("#chart"), options);
+												chart.render();
+                                        });
+                                    </script>
+                                    <div id="chart"></div>
 								</div>
-								<div class="ui two column celled grid">
+                               
+								</div>
+								<div class="ui column celled grid">
                                 <div class="column" style="max-height: 100%">
                                     <!-- services graph -->
                                     <script>
@@ -775,87 +869,7 @@
                                         });
                                     </script>
                                     <div id="stats_services"></div>
-									                                    <script>
-                                        $(document).ready(function () {
-												var options = {
-												  series: [{
-												  name: 'Critical',
-												  data: [44, 55, 41, 37, 22, 43, 21]
-												}, {
-												  name: 'High',
-												  data: [53, 32, 33, 52, 13, 43, 32]
-												}, {
-												  name: 'Medium',
-												  data: [12, 17, 11, 9, 15, 11, 20]
-												}, {
-												  name: 'Low',
-												  data: [9, 7, 5, 8, 6, 9, 4]
-												}, {
-												  name: 'Info',
-												  data: [25, 12, 19, 32, 25, 24, 10]
-												}],
-												  chart: {
-												  type: 'bar',
-												  height: 350,
-												  stacked: true,
-												},
-												plotOptions: {
-												  bar: {
-													horizontal: true,
-													dataLabels: {
-													  total: {
-														enabled: true,
-														offsetX: 0,
-														style: {
-														  fontSize: '13px',
-														  fontWeight: 900
-														}
-													  }
-													}
-												  },
-												},
-												stroke: {
-												  width: 1,
-												  colors: ['#fff']
-												},
-												title: {
-												  text: 'Fiction Books Sales'
-												},
-												xaxis: {
-												  categories: [2008, 2009, 2010, 2011, 2012, 2013, 2014],
-												  labels: {
-													formatter: function (val) {
-													  return val + "K"
-													}
-												  }
-												},
-												yaxis: {
-												  title: {
-													text: undefined
-												  },
-												},
-												tooltip: {
-												  y: {
-													formatter: function (val) {
-													  return val + "K"
-													}
-												  }
-												},
-												fill: {
-												  opacity: 1
-												},
-												legend: {
-												  position: 'top',
-												  horizontalAlign: 'left',
-												  offsetX: 40
-												}
-												};
-
-												var chart = new ApexCharts(document.querySelector("#chart"), options);
-												chart.render();
-                                        });
-                                    </script>
-                                    <div id="chart"></div>
+									
                                 </div>
 								
                             </div>
