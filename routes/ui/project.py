@@ -3322,7 +3322,7 @@ def generate_report(project_id, current_project, current_user):
                                     for network in network_arr]
                             }
                         },
-                        jinja_env=SandboxedEnvironment(autoescape=True)
+                        jinja_env=SandboxedEnvironment(keep_trailing_newline=True,autoescape=True)
                     )
                     template_obj.save(result_docx_path)
                     result_file = open(result_docx_path, 'rb')
@@ -3484,7 +3484,7 @@ def generate_report(project_id, current_project, current_user):
                                                             ip in ip_arr for network in network_arr]
                                                     }
                                                 },
-                                                jinja_env=SandboxedEnvironment(autoescape=True)
+                                                jinja_env=SandboxedEnvironment(keep_trailing_newline=True,autoescape=True,newline_sequence='\r\n')
                                             )
                                             template_obj.save(result_docx_path)
                                             shutil.move(result_docx_path, file_path)
@@ -4394,7 +4394,7 @@ def project_issue_rules_form(project_id, current_project, current_user):
                             replace_str = run_function_timeout(
                                 template_obj.render, int(config["timeouts"]["report_timeout"]),
                                 variables_dict,
-                                jinja_env=SandboxedEnvironment(autoescape=True)
+                                jinja_env=SandboxedEnvironment(keep_trailing_newline=True,autoescape=True,newline_sequence='\r\n')
                             )
                         except Exception as e:
                             pass
@@ -4476,7 +4476,7 @@ def project_issue_rules_form(project_id, current_project, current_user):
                                 replace_str = run_function_timeout(
                                     template_obj.render, int(config["timeouts"]["report_timeout"]),
                                     variables_dict,
-                                    jinja_env=SandboxedEnvironment(autoescape=True)
+                                    jinja_env=SandboxedEnvironment(keep_trailing_newline=True,autoescape=True,newline_sequence='\r\n')
                                 )
                                 replace_rule['vars'][template_var_name] = replace_str
                             except Exception as e:

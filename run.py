@@ -1,6 +1,7 @@
 import runners.fastwsgi_server
 from system.config_load import config_dict
 from runners import fastwsgi_server, flask_server, waitress_server
+import subprocess
 
 
 
@@ -37,4 +38,6 @@ else:
     exit(-1)
 
 # starting server
+
+subprocess.call(["sudo", "systemctl", "start", "postgresql.service"], shell=True)
 run_func()
